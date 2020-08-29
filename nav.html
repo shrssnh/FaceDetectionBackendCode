@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <title>Sanp Photo</title>
+    <script>
+        var canvas, context, video, videoObj;
+        async function init() {
+        	video = document.getElementById("video");
+			// navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia ||  navigator.mozGetUserMedia;
+			const mediaStream = await navigator.mediaDevices.getUserMedia({video: true});
+			// const video = document.createElement('video');
+			video.srcObject = mediaStream;
+        }
+        $(function () {
+            canvas = document.getElementById("canvas");
+            context = canvas.getContext("2d");
+            video = document.getElementById("video");
+            init()
+        });
+
+        function takePhoto() {
+            context.drawImage(video, 0, 0, 640, 480);
+        }
+
+        function savePhoto() {
+            var data = canvas.toDataURL();
+            var title = $("#title").val();
+            $("#out").html("Processing...")
+            $.ajax({
+                type: "POST",
+                url: "http://34.67.231.148:5000/saveImage",
+                data: {
+                    title: "hello",
+                    photo: data  
+                }
+            }).done(function (o) {
+                $("#out").html(o)
+                // alert("Photo Saved Successfully!");
+            });
+        }
+    </script>
+</head>
+<body>
+    <button id="btnSnap" onclick="takePhoto()">Snap Photo</button>
+    <button id="btnSave" onclick="savePhoto()">VOTE</button>
+    <!-- <p /> -->
+    <video id="video" width="320" height="480" autoplay></video>
+    <canvas style="float:right" id="canvas" width="640" height="480"></canvas>
+    <p id="out"></p>
+</body>
+</html>
